@@ -395,7 +395,7 @@ def test_until_success(fcn, args, max_err=.1, num_retries=3):
         if err < max_err:
             return err, idx
         else:
-            print "Warning. Function failed ", str(idx=1), " times. ", fcn, " ", err_arr, " ", args
+            print "Warning. Function failed ", str(idx + 1), " times. ", fcn, " ", err_arr, " ", args
     print "error. Function failed: ", fcn, " ", err_arr, " ", args
     sys.exit(0)
 
@@ -404,21 +404,21 @@ def test_until_success(fcn, args, max_err=.1, num_retries=3):
 def regression_test(verb=0):
     np.random.seed(12345)
     xor_error = test_until_success(test_xor, args=verb)
-    print "xor error: " + str(xor_error)
+    print "xor squared error: " + str(xor_error)
     xor3_error = test_until_success(test_xor3, args=verb, max_err=.4)
-    print "xor3_error: " + str(xor3_error)
+    print "xor3_squared error: " + str(xor3_error)
     sine_error = test_until_success(test_sine, args=verb, max_err=.5)
-    print "sine_error: " + str(sine_error)
+    print "sine_squared error: " + str(sine_error)
     test_1t2s_error = test_until_success(test_1times2squared, args=verb, max_err=1)
-    print "test_1t2s_error: " + str(test_1t2s_error)
+    print "test_1t2s_squared error: " + str(test_1t2s_error)
     test_1t2_error = test_until_success(test_1times2, args=verb)
-    print "test_1t2_error: " + str(test_1t2_error)
+    print "test_1t2_squared error: " + str(test_1t2_error)
     test_1t2c_error = test_until_success(test_1times2cubed, args=verb, max_err=.5)
-    print "test_1t2c_error: " + str(test_1t2c_error)
+    print "test_1t2c_squared error: " + str(test_1t2c_error)
     test_1p21m2_error = test_until_success(test1plus21minus2, args=verb)
-    print "test_1p21m2_error: " + str(test_1p21m2_error)
+    print "test_1p21m2_squared error: " + str(test_1p21m2_error)
     test_inv_error = test_until_success(testinv, args=verb, max_err=2)
-    print "test_inv_error: " + str(test_inv_error)
+    print "test_inv_squared error: " + str(test_inv_error)
     # print "%d %d %d %d %d %d %d %d" % (xor_error[0], xor3_error[0], sine_error[0], \
     #        test_1t2s_error[0], test_1t2_error[0], test_1t2c_error[0], test_1p21m2_error[0], test_inv_error[0])
 regression_test(verb=0)
