@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import time
+import random
 
 # names of batch training types. I forget how to do this in python.
 solo = -1
@@ -291,7 +292,7 @@ def test_1times2squared(verb=0):
                   [2, 2]])
     # y = np.array([0, 0, 0, 0, 1, 4, 0, 2, 8])
     y = np.array([np.array([x[0] * x[1] ** 2]) for x in X])
-    trial_NN.train(X, y, epochs=100, verb=verb)
+    trial_NN.train(X, y, epochs=500, verb=verb, re_init_tries=10, re_init_depth=50)
     y_predict = trial_NN.predict(X)
     y_predict = np.around(y_predict, 2)
     if verb > 0:
@@ -302,7 +303,7 @@ def test_1times2squared(verb=0):
         print 'error: ' + str(np.mean(np.square(y_predict - y)))
         print 'weights values squared: ' + str(np.mean([np.mean([np.mean(np.square(y)) for y in x]) for x in trial_NN.weights]))
     return np.mean(np.square(y_predict - y))
-# test_1times2squared()
+# test_1times2squared(1)
 def test_1times2(verb=0):
     np.seterr(all='raise')
     trial_NN = Lee_NN([2, 100, 100, 1], perf_fcn='mse', trans_fcn='tanh', reg=10 ** (-10));
@@ -335,8 +336,8 @@ def test_1times2cubed(verb=0):
     trial_NN = Lee_NN([2, 1000, 1], perf_fcn='mse', trans_fcn='sigmoid', reg=10 ** (-10));
     X = np.array([np.array([x, y]) for x in np.arange(0, 2, .2) for y in np.arange(0, 2, .2)])
     y = np.array([np.array([x[0] * x[1] ** 3]) for x in X])
-    trial_NN.train(X, y / 8.0, epochs=100, verb=verb)
-    y_predict = trial_NN.predict(X) * 8
+    trial_NN.train(X, y, epochs=100, verb=verb, re_init_tries=10, re_init_depth=50)
+    y_predict = trial_NN.predict(X)
     y_predict = np.around(y_predict, 2)
     if verb > 0:
         for row in np.concatenate([X.T, np.atleast_2d(y).T, y_predict.T]).T:
@@ -347,7 +348,7 @@ def test_1times2cubed(verb=0):
         print 'error: ' + str(np.mean(np.square(y_predict - y)))
         print 'weights values squared: ' + str(np.mean([np.mean([np.mean(np.square(y)) for y in x]) for x in trial_NN.weights]))
     return np.mean(np.square(y_predict - y))
-# print test_1times2cubed()
+# print test_1times2cubed(1)
 def test1plus21minus2(verb=0):
     np.seterr(all='raise')
     trial_NN = Lee_NN([2, 1000, 2], perf_fcn='mse', trans_fcn='tanh', reg=10 ** (-3));
@@ -393,12 +394,15 @@ def test_until_success(fcn, args, max_err=.1, num_retries=3):
         err_arr.append(err)
         if err < max_err:
             return err, idx
+        else:
+            print "Warning. Function failed ", str(idx=1), " times. ", fcn, " ", err_arr, " ", args
     print "error. Function failed: ", fcn, " ", err_arr, " ", args
     sys.exit(0)
 
 
 
 def regression_test(verb=0):
+    np.random.seed(12345)
     xor_error = test_until_success(test_xor, args=verb)
     print "xor error: " + str(xor_error)
     xor3_error = test_until_success(test_xor3, args=verb, max_err=.4)
@@ -409,7 +413,7 @@ def regression_test(verb=0):
     print "test_1t2s_error: " + str(test_1t2s_error)
     test_1t2_error = test_until_success(test_1times2, args=verb)
     print "test_1t2_error: " + str(test_1t2_error)
-    test_1t2c_error = test_until_success(test_1times2cubed, args=verb, max_err=.3)
+    test_1t2c_error = test_until_success(test_1times2cubed, args=verb, max_err=.5)
     print "test_1t2c_error: " + str(test_1t2c_error)
     test_1p21m2_error = test_until_success(test1plus21minus2, args=verb)
     print "test_1p21m2_error: " + str(test_1p21m2_error)
