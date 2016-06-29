@@ -1,10 +1,11 @@
 # The following is a Neural Network class using Numpy.
 # It should test clean using flake8 for all coding
-# standards except for E128 and F405
-# Ex: flake8 NN_numpy.py --ignore E128,F405
+# standards except for E128, F405 and F812
+# Ex: flake8 NN_numpy.py --ignore E128,F405,F812
 
 from NNn_helper import *  # noqa
 import sys
+import copy
 
 # gb means global best
 # LR means learning rate
@@ -14,7 +15,7 @@ import sys
 
 class NNn:
 
-    def __init__(self, layers, trans='sigmoid', perf_fcn='cross_entropy',
+    def __init__(self, layers, trans='sigmoid', perf_fcn='mse',
                  reg=0, netstruc='feed_forward'):
         self.norm = np.ones(layers[-1])
         self.size = layers
@@ -75,6 +76,15 @@ class NNn:
         self.reg = reg
         self.deltas = np.copy(self.act_vals)
         self.best_perf = np.inf
+
+    def copy_structure(self):
+        new_NN = copy.deepcopy(self)
+        new_NN.init_weights()
+        return new_NN
+
+    def remove_input(self):
+        self.size[0] = self.size[0] - 1
+        self.init_weights()
 
     def init_weights(self, div=2):
         self.weights = [[[0] for _ in xrange(len(self.Lmap))]

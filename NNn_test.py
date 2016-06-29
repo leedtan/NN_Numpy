@@ -1,6 +1,67 @@
 from NN_numpy import *  # noqa
-import matplotlib.pyplot as plt
-import time
+from NNn_optimization import *  # noqa
+import csv
+
+
+def test_stocks(verb=0, re_init=10, netstruc='feed_forward',
+                lookback=2, optimize=True,
+                input_significance=True, validation=True, prediction=True):
+    csv_file = csv.reader(open('./data/stock_returns_base150.csv', 'rb'))
+    csv_file.next()  # header = csv_file_object.next()
+    dat = []
+    for row in csv_file:
+        dat.append(row)
+    dat = np.array(dat)
+    Y = dat[:, [1]]
+    X = dat[:, 1:]
+    X[50:, 0] = 0
+    Y_trn = Y[lookback:50]
+    Y_trn = np.array([y.astype(np.float) for y in Y_trn])
+    X_with_lookback = []
+    for idx in xrange(len(dat) - lookback):
+        X_with_lookback.append(
+            cat(np.array([x_row.astype(np.float)
+            for x_row in X[idx:idx + lookback + 1]])))
+    X_with_lookback = np.array(X_with_lookback)
+    X_with_lookback = np.delete(X_with_lookback, len(X[0]) * lookback, 1)
+    X_trn = X_with_lookback[0:50 - lookback]
+    X_tst = X_with_lookback[50 - lookback:]
+    StockNN_standard = NNn([len(X_trn[0]), 30, 1],
+                  netstruc=netstruc, reg=10 ** -1, trans='tanh')
+    # Enable to view optimization of a specific variable.
+    # Only implementated for single variables
+    # for now second variable must be done in an outer loop in this function
+    if optimize:
+        StockNN = copy.deepcopy(StockNN_standard)
+        error = []
+        error.append(NNn_optimize(optimize=['net width'], fcn=kfoldvalidation,
+            hidden_layers=[30], netstruc=netstruc, reg=10 ** -1,
+            opt_vals=[n for n in range(10, 50, 10)],
+            default_net=StockNN, X_trn=X_trn, Y_trn=Y_trn, k=5,
+            LR=.1, epochs=100, trans='tanh', verb=verb,
+            re_init=3, re_init_d=20))
+        error.append(NNn_optimize(optimize=['net width'], fcn=kfoldvalidation,
+            hidden_layers=[30, 30], netstruc=netstruc, reg=10 ** -1,
+            opt_vals=[n for n in range(10, 50, 10)],
+            default_net=StockNN, X_trn=X_trn, Y_trn=Y_trn, k=5,
+            LR=.1, epochs=100, trans='tanh', verb=verb,
+            re_init=3, re_init_d=20))
+    # Test Removing items.
+    if input_significance:
+        test_input_significance_stocks(
+            StockNN_standard, X_trn, Y_trn, cols=len(X[0]))
+
+    if validation:
+        validate_model(StockNN_standard, X_trn, Y_trn, k=10, graph=False,
+                       LR=.1, epochs=100, verb=verb, re_init=4, re_init_d=30)
+    if prediction:
+        predict_future(net=StockNN_standard,
+                       X_trn=X_trn, Y_trn=Y_trn, X_tst=X_tst,
+                       cols=len(X[0]), lookback=lookback, dat=dat,
+                       epochs=100, re_init=5, re_init_d=30)
+test_stocks(verb=0, optimize=False, input_significance=False,
+            validation=False, prediction=True)
+
 
 def test_xor(verb=0, re_init=10, netstruc='feed_forward'):
     tNN = NNn([2, 100, 100, 1], reg=10 ** -8, netstruc=netstruc)

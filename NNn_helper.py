@@ -1,4 +1,5 @@
 import numpy as np
+
 # names of batch training types:
 solo = -1
 group = 0
@@ -43,6 +44,8 @@ def cross_entropy(y, a):
         - (1 - y) * np.log(1 - a + (10 ** -100))
 
 
+# I think this is wrong and I haven't implemented the
+# true cross entropy derivative function.
 def cross_entropy_p(y, a):
     return (y - a)
 
@@ -64,3 +67,14 @@ def zero_weights(weights):
     return [[np.array([np.zeros_like(z) for z in w]) if
              (len(w) != 1 or w[0] != 0) else [0] for w in x] for x in weights]
 
+
+def normalize(vect):
+    offset = np.mean(vect)
+    vect = vect - offset
+    stdev = np.std(vect)
+    vect = vect / stdev
+    return [vect, stdev, offset]
+
+
+def denormalize(vect, stdev, offset):
+    return (vect * stdev) + offset
