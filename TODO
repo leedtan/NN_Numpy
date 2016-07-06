@@ -1,0 +1,4 @@
+Prioritized task of todo items.
+Implement softmax transfer fcn (to use with cross entropy to output layer)
+Implement purelin transfer fcn (to use as output layer for regression)
+Clean up stock code
