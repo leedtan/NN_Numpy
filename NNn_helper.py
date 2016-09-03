@@ -44,8 +44,8 @@ def cross_entropy(y, a):
         - (1 - y) * np.log(1 - a + (10 ** -100))
 
 
-# I think this is wrong and I haven't implemented the
-# true cross entropy derivative function.
+#This is the derivative of cross entropy cost wrt node output 
+#value for softmax and logistic transfer fcns.
 def cross_entropy_p(y, a):
     return (y - a)
 
