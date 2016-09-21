@@ -1,4 +1,7 @@
 Prioritized task of todo items.
+Fix backprop bug (maybe rewrite structure)
 Implement softmax transfer fcn (to use with cross entropy to output layer)
 Implement purelin transfer fcn (to use as output layer for regression)
+implement convolutional layer
+Implement pooling layer
 Clean up stock code
